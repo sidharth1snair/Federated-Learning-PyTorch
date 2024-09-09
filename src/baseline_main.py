@@ -86,11 +86,21 @@ if __name__ == '__main__':
 
     # Plot loss
     plt.figure()
+
+
     plt.plot(range(len(epoch_loss)), epoch_loss)
     plt.xlabel('epochs')
     plt.ylabel('Train loss')
-    plt.savefig('../save/nn_{}_{}_{}.png'.format(args.dataset, args.model,
-                                                 args.epochs))
+    import os
+    import matplotlib.pyplot as plt
+
+    # Specify the correct save directory
+    save_dir = 'D:/Federated-Learning-PyTorch/save/'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Combine the directory and filename
+    file_path = os.path.join(save_dir, 'nn_{}_{}_{}.png'.format(args.dataset, args.model, args.epochs))
 
     # testing
     test_acc, test_loss = test_inference(args, global_model, test_dataset)

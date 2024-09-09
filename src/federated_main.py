@@ -29,9 +29,13 @@ if __name__ == '__main__':
     args = args_parser()
     exp_details(args)
 
-    if args.gpu_id:
-        torch.cuda.set_device(args.gpu_id)
-    device = 'cuda' if args.gpu else 'cpu'
+    if args.gpu != -1 and torch.cuda.is_available():  # Check if GPU is available and args.gpu is valid
+        torch.cuda.set_device(args.gpu)
+        device = 'cuda'
+    else:
+        device = 'cpu'
+
+    print(f"Using device: {device}")
 
     # load dataset and user groups
     train_dataset, test_dataset, user_groups = get_dataset(args)
@@ -122,10 +126,18 @@ if __name__ == '__main__':
     print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
 
     # Saving the objects train_loss and train_accuracy:
-    file_name = '../save/objects/{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}].pkl'.\
-        format(args.dataset, args.model, args.epochs, args.frac, args.iid,
-               args.local_ep, args.local_bs)
+    import os
 
+    # Ensure the save directory exists
+    save_dir = '../save/objects/'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # File name to save
+    file_name = os.path.join(save_dir, '{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}].pkl'.format(
+        args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep, args.local_bs))
+
+    # Saving the objects
     with open(file_name, 'wb') as f:
         pickle.dump([train_loss, train_accuracy], f)
 
